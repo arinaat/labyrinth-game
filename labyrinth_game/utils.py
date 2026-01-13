@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 
-from labyrinth_game.constants import ROOMS
+from labyrinth_game.constants import EVENT_MODULO, ROOMS
 
 
 def describe_current_room(game_state: dict) -> None:
@@ -12,6 +12,7 @@ def describe_current_room(game_state: dict) -> None:
     title = room_key.upper()
     print(f"\n== {title} ==")
     print(room["description"])
+    print(f"HP: {game_state.get('health', 100)}/100")
 
     items = room.get("items", [])
     if items:
@@ -91,9 +92,10 @@ def trigger_trap(game_state: dict) -> None:
     """
     Ловушка:
     - если инвентарь не пуст: теряешь случайный предмет
-    - если пуст: получаешь урон; при малом roll (<3) — проигрыш
+    - если пуст: получаешь урон 
     """
-    print("Пол под вами дрогнул... кажется, ловушка сработала снова!")
+    game_state["traps_triggered"] = int(game_state.get("traps_triggered", 0)) + 1
+    again = game_state["traps_triggered"] > 1
 
     inv = game_state.get("player_inventory", [])
     steps = int(game_state.get("steps_taken", 0))
@@ -101,18 +103,22 @@ def trigger_trap(game_state: dict) -> None:
     if inv:
         idx = pseudo_random(steps, len(inv))
         lost = inv.pop(idx)
-        print(f"Ловушка сработала! Вы потеряли предмет: {lost}")
+        prefix = "Ловушка снова сработала" if again else "Ловушка сработала"
+        print(f"{prefix}! Вы потеряли предмет: {lost}.")
         return
 
-    roll = pseudo_random(steps, 10) 
+    roll = pseudo_random(steps, 10)
+
     if roll < 3:
-        print("Ловушка нанесла смертельный удар. Вы проиграли.")
-        game_state["game_over"] = True
-        return
+        roll = 3
 
-    damage = roll * 5  
+    damage = 15 + roll * 3
     game_state["health"] = max(0, int(game_state.get("health", 100)) - damage)
-    print(f"Ловушка сработала! Вы получили урон (-{damage}).")
+
+    prefix = "Ловушка снова сработала" if again else "Ловушка сработала"
+    print(f"{prefix}! Вы получили урон (-{damage}).")
+    print(f"HP: {game_state['health']}/100")
+
     if game_state["health"] <= 0:
         print("Ваше здоровье на нуле. Вы проиграли.")
         game_state["game_over"] = True
@@ -121,18 +127,17 @@ def trigger_trap(game_state: dict) -> None:
 def random_event(game_state: dict) -> None:
     """
     Случайные события после перемещения.
-    Срабатывает редко: если pseudo_random(...) == 0.
     3 сценария:
     0) находка coin в комнате
     1) испуг (меч помогает)
     2) ловушка (ТОЛЬКО trap_room и если нет torch)
     """
     steps = int(game_state.get("steps_taken", 0))
-    happen = pseudo_random(steps, 10)  # 1/10 шанс
+    happen = pseudo_random(steps, EVENT_MODULO)  
     if happen != 0:
         return
 
-    roll = pseudo_random(steps + 7, 3)  # 0..2
+    roll = pseudo_random(steps + 7, 3)  
 
     if roll == 0:
         room_key = game_state["current_room"]

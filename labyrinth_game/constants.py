@@ -1,3 +1,8 @@
+EVENT_MODULO = 2
+TRAP_ROOM_ID = "trap_room"
+TRAP_DAMAGE = 30
+MIN_HEALTH_TO_SURVIVE = 0
+
 ROOMS = {
     'entrance': {
         'description': 'Вы в темном входе лабиринта. Стены покрыты мхом. На полу лежит старый факел.',
