@@ -1,10 +1,12 @@
 from labyrinth_game.player_actions import (
+    attempt_open_treasure,
     move_player,
     show_inventory,
+    solve_current_room_puzzle,
     take_item,
     use_item,
 )
-from labyrinth_game.utils import describe_current_room, solve_puzzle
+from labyrinth_game.utils import describe_current_room
 
 
 def main() -> None:
@@ -13,7 +15,9 @@ def main() -> None:
         "current_room": "entrance",
         "game_over": False,
         "steps_taken": 0,
+        "health": 100,
         "treasure_door_open": False,
+        "hall_puzzle_solved": False,
     }
 
     print("Добро пожаловать в Лабиринт сокровищ!")
@@ -23,62 +27,56 @@ def main() -> None:
         command = input("> ").strip().lower()
 
         if command in ("quit", "exit"):
-            game_state["game_over"] = True
             print("Вы вышли из игры.")
+            break
 
-        elif command == "look":
+        if command == "look":
             describe_current_room(game_state)
+            continue
 
-        elif command == "inventory":
+        if command == "inventory":
             show_inventory(game_state)
+            continue
 
-        elif command == "solve":
-            solve_puzzle(game_state)
+        if command == "solve":
+            solve_current_room_puzzle(game_state)
+            continue
 
-        elif command == "open":
-            # Победа: можно открыть только в treasure_room после solve
-            if game_state["current_room"] != "treasure_room":
-                print("Открывать нечего. Найдите сокровищницу.")
-            elif not game_state["treasure_door_open"]:
-                print("Сундук защищён. Сначала решите загадку: solve")
-            else:
-                print("\nСундук открыт! Вы нашли сокровища!")
-                print("Победа! Игра завершена.")
-                game_state["game_over"] = True
+        if command == "open":
+            attempt_open_treasure(game_state)
+            continue
 
-        elif command == "go":
+        if command == "go":
             print("Куда идти? Пример: go north")
+            continue
 
-        elif command.startswith("go "):
-            parts = command.split(maxsplit=1)
-            direction = parts[1] if len(parts) > 1 else ""
-            if not direction:
-                print("Куда идти? Пример: go north")
-            else:
-                move_player(game_state, direction)
+        if command.startswith("go "):
+            direction = command.split(maxsplit=1)[1]
+            move_player(game_state, direction)
+            continue
 
-        elif command == "take":
+        if command == "take":
             print("Что подобрать? Пример: take torch")
+            continue
 
-        elif command.startswith("take "):
-            parts = command.split(maxsplit=1)
-            item_name = parts[1] if len(parts) > 1 else ""
+        if command.startswith("take "):
+            item_name = command.split(maxsplit=1)[1]
             take_item(game_state, item_name)
+            continue
 
-        elif command == "use":
+        if command == "use":
             print("Что использовать? Пример: use torch")
+            continue
 
-        elif command.startswith("use "):
-            parts = command.split(maxsplit=1)
-            item_name = parts[1] if len(parts) > 1 else ""
+        if command.startswith("use "):
+            item_name = command.split(maxsplit=1)[1]
             use_item(game_state, item_name)
+            continue
 
-        else:
-            print(
-                  "Команды: look / inventory / go <dir> / take <item> / use <item> / "
-                  "solve / open / quit"
-                )
-
+        print(
+            "Команды: look / inventory / go <dir> / take <item> / use <item> / "
+            "solve / open / quit"
+        )
 
 
 if __name__ == "__main__":
