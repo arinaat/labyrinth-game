@@ -1,5 +1,10 @@
+from labyrinth_game.player_actions import (
+    move_player,
+    show_inventory,
+    take_item,
+    use_item,
+)
 from labyrinth_game.utils import describe_current_room, solve_puzzle
-from labyrinth_game.player_actions import move_player, show_inventory, take_item, use_item
 
 
 def main() -> None:
@@ -70,8 +75,10 @@ def main() -> None:
 
         else:
             print(
-                "Команды: look / inventory / go <dir> / take <item> / use <item> / solve / open / quit"
-            )
+                  "Команды: look / inventory / go <dir> / take <item> / use <item> / "
+                  "solve / open / quit"
+                )
+
 
 
 if __name__ == "__main__":
