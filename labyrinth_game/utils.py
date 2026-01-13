@@ -36,5 +36,10 @@ def solve_puzzle(game_state: dict) -> None:
     if user_answer == str(answer).strip().lower():
         print("Верно! Загадка решена.")
         room["puzzle"] = None
+
+        # важное: если это сокровищница — отмечаем, что дверь открыта
+        if current_room == "treasure_room":
+            game_state["treasure_door_open"] = True
+            print("Вы слышите щелчок механизма. Дверь в сокровищницу открыта!")
     else:
         print("Неверно. Попробуйте снова.")

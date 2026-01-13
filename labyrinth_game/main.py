@@ -8,6 +8,7 @@ def main() -> None:
         "current_room": "entrance",
         "game_over": False,
         "steps_taken": 0,
+        "treasure_door_open": False,
     }
 
     print("Добро пожаловать в Лабиринт сокровищ!")
@@ -28,6 +29,17 @@ def main() -> None:
 
         elif command == "solve":
             solve_puzzle(game_state)
+
+        elif command == "open":
+            # Победа: можно открыть только в treasure_room после solve
+            if game_state["current_room"] != "treasure_room":
+                print("Открывать нечего. Найдите сокровищницу.")
+            elif not game_state["treasure_door_open"]:
+                print("Сундук защищён. Сначала решите загадку: solve")
+            else:
+                print("\nСундук открыт! Вы нашли сокровища!")
+                print("Победа! Игра завершена.")
+                game_state["game_over"] = True
 
         elif command == "go":
             print("Куда идти? Пример: go north")
@@ -57,7 +69,9 @@ def main() -> None:
             use_item(game_state, item_name)
 
         else:
-            print("Команды: look / inventory / go <dir> / take <item> / use <item> / solve / quit")
+            print(
+                "Команды: look / inventory / go <dir> / take <item> / use <item> / solve / open / quit"
+            )
 
 
 if __name__ == "__main__":
