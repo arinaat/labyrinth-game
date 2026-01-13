@@ -21,3 +21,20 @@ def move_player(game_state: dict, direction: str) -> None:
     game_state["current_room"] = exits[direction]
     game_state["steps_taken"] += 1
     describe_current_room(game_state)
+
+
+def take_item(game_state: dict, item_name: str) -> None:
+    current_room = game_state["current_room"]
+    room_items = ROOMS[current_room]["items"]
+
+    if not item_name:
+        print("Что подобрать? Пример: take torch")
+        return
+
+    if item_name not in room_items:
+        print("Такого предмета здесь нет.")
+        return
+
+    room_items.remove(item_name)
+    game_state["player_inventory"].append(item_name)
+    print(f"Вы подняли предмет: {item_name}")

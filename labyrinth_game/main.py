@@ -1,5 +1,5 @@
 from labyrinth_game.utils import describe_current_room
-from labyrinth_game.player_actions import move_player, show_inventory
+from labyrinth_game.player_actions import move_player, show_inventory, take_item
 
 
 def main() -> None:
@@ -32,8 +32,14 @@ def main() -> None:
             else:
                 direction = parts[1]
                 move_player(game_state, direction)
+        elif command == "take":
+            print("Что подобрать? Пример: take torch")
+        elif command.startswith("take "):
+            parts = command.split(maxsplit=1)
+            item_name = parts[1] if len(parts) > 1 else ""
+            take_item(game_state, item_name)
         else:
-            print("Пока доступны только команды: look / inventory / go / quit / exit")
+            print("Пока доступны только команды: look / inventory / go / take / quit / exit")
 
 
 if __name__ == "__main__":
